@@ -352,7 +352,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c9503f7f9e49da40bd28276e89f4991, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _slider: {fileID: 199925284}
+  progress: 1
+  fillRate: 0.01
+  slider: {fileID: 0}
 --- !u!95 &199925287
 Animator:
   serializedVersion: 3

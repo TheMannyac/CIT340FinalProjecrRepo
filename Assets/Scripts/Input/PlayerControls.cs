@@ -7,7 +7,8 @@ public class PlayerControls: MonoBehaviour
 {
     ///Public data fields
     public float moveSpeed = 4.5f;   //movement speed of the player
-   
+    public bool shouldFlipDirection = true;
+    [SerializeField] private bool HasAnimator = true;
     
     Rigidbody2D rb;
     Animator animator;
@@ -20,12 +21,16 @@ public class PlayerControls: MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
         if (rb == null)
             Debug.Log("The Player object should have a ridgidBody2D component");
-        if (animator == null)
-            Debug.Log("The Player object does not have a component");
 
+        if (HasAnimator)
+        {
+            animator = GetComponent<Animator>();
+            if (animator == null)
+                Debug.Log("The Player object does not have a component");
+        }
+        
     }
 
     //Executes when object is initialized
@@ -50,12 +55,14 @@ public class PlayerControls: MonoBehaviour
         
         moveDirection.Normalize();
 
-        
-        animator.SetFloat("Horizontal", inputX);
-        animator.SetFloat("Vertical", inputY);
-        animator.SetFloat("Velocity", magnitude);
-
-        //TODO come back to this
+        if (HasAnimator)
+        {
+            animator.SetFloat("Horizontal", inputX);
+            animator.SetFloat("Vertical", inputY);
+            animator.SetFloat("Velocity", magnitude);
+        }
+           
+        if(shouldFlipDirection)
         if (facingRight && inputX < 0 )
         {
             Flip();

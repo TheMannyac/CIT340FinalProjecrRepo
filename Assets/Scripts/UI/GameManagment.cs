@@ -4,21 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManagment: MonoBehaviour
 {
-    
-
-   //public Scene nextScene;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     //Returns to the main menu
     public static void goToMenu()

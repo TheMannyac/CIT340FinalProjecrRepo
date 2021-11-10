@@ -6,11 +6,18 @@ using UnityEngine.UI;
 public class Health : MonoBehaviour
 {
     public int maxHP = 100;
-    public GameObject dropObject = null;   //prefab that wil be spawned on death
-    public float dropRate = .1f;   //percent chance from 0 to 1 that item will drop
+    public bool hasInvincibilityFrames = false;
+    public float invincibilityDuration = 1.5f; 
     public Slider _slider;
 
-    [SerializeField] private int currentHP;
+    private int currentHP;
+
+    private Collider2D collider;
+
+    private void Awake()
+    {
+        collider = GetComponent<Collider2D>();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -18,7 +25,7 @@ public class Health : MonoBehaviour
         currentHP = maxHP;
         if (_slider != null)
         {
-            _slider.GetComponent<SliderScript>().UpdateValue(currentHP/maxHP);
+            _slider.GetComponent<SliderScript>().setFillPercent(currentHP/maxHP);
         }
     }
 
@@ -31,45 +38,52 @@ public class Health : MonoBehaviour
     /*returns whether or not th object dies
      * 
      */
-    public bool changeHP(int changeInHP)
+    public bool takeDamage(int changeInHP)
     {
         //plays a hitsound if the object was attacked
-        if (changeInHP >= 0)
-        {
-           // playHitSound();
-        }
+
+
 
         //apply change to current HP
         currentHP = Mathf.Min(maxHP, currentHP - changeInHP);
 
         if (_slider != null)
         {
-            _slider.GetComponent<SliderScript>().UpdateValue(currentHP/maxHP);
-        } 
+            _slider.GetComponent<SliderScript>().setFillPercent(currentHP / maxHP);
+        }
 
         //Object dies and returns true if it goes below 0
         if (currentHP <= 0)
         {
             Die();
             return true;
-        }
-
-        //otherwise returns false
-        return false;
-    }
-
-    void playHitSound()
-    {
-        switch (gameObject.tag)
+        } else
         {
-            case "Player":
-                SoundManager.instance.PlaySound("Player_hit");
-                break;
-            case "Enemy":
-                SoundManager.instance.PlaySound("Player_hit");
-                break; 
+            hitInvincibilty();
+
+            //otherwise returns false
+            return false;
         }
     }
+
+    private IEnumerator hitInvincibilty()
+    {
+        float elapsedTime = 0;
+        //disable colliders [THIS IS A HOT FIX, SHOULD FIX LATER TO AVOID STUFF CLIPPING OUT OF BOUNDS] 
+        collider.enabled = false;
+        Debug.LogWarning(name + "'s colliders have been disabled. You might wanna change this, dumbass");
+
+        while (elapsedTime < invincibilityDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log(name + "'s invincibility has ended");
+        //re-enable colliders
+        collider.enabled = true;
+    }
+
 
     public void Die()
     {
@@ -78,23 +92,10 @@ public class Health : MonoBehaviour
             case "Player":
                 //return to main menu if the player dies
                 Debug.Log("the player has died");
-                GameManagment.goToLoseScreen();
-                //Invoke("GameManagment.goToMenu", .5f);
+                //GameManagment.goToLoseScreen();
                 break;
-            case "Enemy":
-                //randomly drop a powerup when an enemy is killed
-                if(dropObject != null)
-        {
-                    //checks item drop probability
-                    if (Random.value <= dropRate)
-                    {
-                        Instantiate(dropObject, transform.position, transform.rotation);
-                    }
-                }
-                break;
-    }
-        //item drop on death
-        
+              
+        }
         Destroy(gameObject);
     }
 }

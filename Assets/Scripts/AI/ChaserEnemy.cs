@@ -23,7 +23,7 @@ public class ChaserEnemy : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            bool killedTarget = collision.gameObject.GetComponent<Health>().changeHP(damage);
+            bool killedTarget = collision.gameObject.GetComponent<Health>().takeDamage(damage);
             
         }
      

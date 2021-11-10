@@ -75,3 +75,21 @@ MonoBehaviour:
     pitch: 1
     loop: 1
     source: {fileID: 0}
+  - name: firecracker
+    clip: {fileID: 8300000, guid: 1a21a99c690b52d40bfc9c4e6054a90d, type: 3}
+    volume: 0.494
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: squish
+    clip: {fileID: 8300000, guid: 8089079f76181a54896043000b3f1cee, type: 3}
+    volume: 0.8
+    pitch: 0.63
+    loop: 0
+    source: {fileID: 0}
+  - name: levelUp
+    clip: {fileID: 8300000, guid: 889e8f3535fbd4145a46c6802d08438f, type: 3}
+    volume: 0.8
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}

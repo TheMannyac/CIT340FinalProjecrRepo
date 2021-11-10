@@ -44,7 +44,7 @@ public class laser : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Enemies"))
         {
            Debug.Log("hit has occured");
-           collision.gameObject.GetComponent<Health>().changeHP(damage);
+           collision.gameObject.GetComponent<Health>().takeDamage(damage);
 
         }
            

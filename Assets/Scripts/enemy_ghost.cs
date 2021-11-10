@@ -16,8 +16,6 @@ public class enemy_ghost : MonoBehaviour
     private Vector2 prevWaypoint;
     private int targetWaypointIndex;
 
-
-
     private SpriteRenderer sr;
     private WaypointManager WaypointMan;
 
@@ -44,9 +42,15 @@ public class enemy_ghost : MonoBehaviour
         prevWaypoint = transform.position;
         targetWaypoint = WaypointMan.waypoints[0];
 
+    }
+
+    private void OnEnable()
+    {
+        //Debug.Log("object is enabled");
         //Begin attacking
         StartCoroutine(shootBullet());
     }
+
 
     // Update is called once per frame
     void Update()
@@ -85,7 +89,7 @@ public class enemy_ghost : MonoBehaviour
 
     }
 
-    private IEnumerator shootBullet()
+    public IEnumerator shootBullet()
     {
         while (true)
         {

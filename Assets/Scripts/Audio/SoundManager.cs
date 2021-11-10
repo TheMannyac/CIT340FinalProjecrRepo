@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
-    public Sound[] sounds;
+    [SerializeField] private Sound[] sounds;
+    [SerializeField] private Sound[] musicTracks;
+    public string playOnLoad;
+
+    Sound currentTrack;
 
     public static SoundManager instance;
     private void Awake()
@@ -14,6 +18,8 @@ public class SoundManager : MonoBehaviour
             instance = this;
         else
         {
+            //Play this room's theme before destroying object
+            instance.PlayMusic(playOnLoad);
             Destroy(gameObject);
             Debug.Log("SOUNDMANAGER DESTROYED");
             return;
@@ -22,7 +28,17 @@ public class SoundManager : MonoBehaviour
         //The audio manager persists between scenes
         DontDestroyOnLoad(gameObject);
 
+        //Initialize Sounds
         foreach (Sound s in sounds){
+            s.source = gameObject.AddComponent<AudioSource>();
+            s.source.clip = s.clip;
+
+            s.source.volume = s.volume;
+            s.source.pitch = s.pitch;
+        }
+        //Initialize Music Tracks
+        foreach (Sound s in musicTracks)
+        {
             s.source = gameObject.AddComponent<AudioSource>();
             s.source.clip = s.clip;
 
@@ -33,7 +49,12 @@ public class SoundManager : MonoBehaviour
 
     private void Start()
     {
-        PlaySound("Theme");
+        PlayMusic(playOnLoad);
+    }
+
+     void Update()
+    {
+        
     }
 
     public void PlaySound(string name)
@@ -45,6 +66,28 @@ public class SoundManager : MonoBehaviour
             return;
         }
         s.source.Play();
+    }
+
+    public void PlayMusic(string trackName)
+    {
+        Debug.Log("We are trying to play " + trackName);
+        Sound newSong = Array.Find(musicTracks, sound => sound.name == trackName);
+        if (newSong == null)
+        {
+            Debug.LogWarning("Track " + trackName + " not found");
+            return;
+        } else if(newSong.source.isPlaying)
+        {
+            Debug.LogWarning("Track " + trackName + " already playing");
+            return;
+        } else
+        {
+            if (currentTrack != null && currentTrack.source.isPlaying)
+                currentTrack.source.Stop();
+
+            currentTrack = newSong;
+            currentTrack.source.Play();
+        }
     }
 
 }

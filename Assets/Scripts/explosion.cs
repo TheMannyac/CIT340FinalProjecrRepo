@@ -39,7 +39,7 @@ public class explosion : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Player"))
         {
-            collision.GetComponent<Health>().changeHP(damage);
+            collision.GetComponent<Health>().takeDamage(damage);
             Rigidbody2D enemyRB = collision.GetComponent<Rigidbody2D>();
   
             Vector2 dir = ((collision.transform.position - this.transform.position).normalized) * knockbackPower;

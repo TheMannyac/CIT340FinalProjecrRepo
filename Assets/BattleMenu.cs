@@ -1,0 +1,24 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BattleMenu : MonoBehaviour
+{
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    //called when the fight button is pressed
+    public void OnSelectFight()
+    {
+        BattleManager.instance.endTurn();
+    }
+}

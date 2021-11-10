@@ -35,7 +35,7 @@ public class Logos : MonoBehaviour
     {
         if (OnShardDealsDamage != null)
         {
-            Debug.Log(gameObject.name + " has dealt damage");
+            //Debug.Log(gameObject.name + " has dealt damage");
             OnShardDealsDamage();
         }
     }

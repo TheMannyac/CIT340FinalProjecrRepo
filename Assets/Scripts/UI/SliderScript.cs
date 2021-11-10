@@ -5,16 +5,31 @@ using UnityEngine.UI;
 
 public class SliderScript : MonoBehaviour
 {
-
     [SerializeField] private float progress = 1;
-    public Slider _slider;
-   
-    public void UpdateValue(float newValue)
+    [SerializeField] private float fillRate = .01f;
+    public Slider slider;
+
+    private void Start()
     {
-        Debug.Log("value uppdated");
-        progress = newValue;
-        _slider.value = progress;
-        Debug.Log(_slider.value);
+       
     }
+
+    public void setFillPercent(float fillPercent)
+    {
+        progress = fillPercent;
+        //Debug.Log("Bar value is now " + progress);
+        StartCoroutine(GradualChange());
+    }
+
+    private IEnumerator GradualChange()
+    {
+        while (progress != slider.value)
+        {
+            slider.value += fillRate * Mathf.Sign(progress - slider.value);
+            yield return new WaitForFixedUpdate();
+        }
+    }
+
+   // private IEnumerator 
 
 }
