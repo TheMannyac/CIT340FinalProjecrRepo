@@ -45,14 +45,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleState: 0
   playerBattleStation: {x: 0, y: 0}
+  playerTurn: 1
   currentEncounter:
     pfEnemiesInEncounter:
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
+    attackDuration: 6
     serious: 0
-  enemyBattleStations:
+  enemyIdlePositions:
   - {x: 0, y: 0}
   - {x: 0, y: 0}
   - {x: 0, y: 0}
-  currentEnemies: []
+  enemyArenaPositions:
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}

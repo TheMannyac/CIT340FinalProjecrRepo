@@ -6,7 +6,9 @@ using UnityEngine.UI;
 public class SliderScript : MonoBehaviour
 {
     [SerializeField] private float progress = 1;
-    [SerializeField] private float fillRate = .01f;
+    [SerializeField] private float fillTime = 1;
+    [SerializeField] private float fillRate = .1f;
+    [SerializeField] private float fillThreashhold = .01f;
     public Slider slider;
 
     private void Start()
@@ -14,22 +16,29 @@ public class SliderScript : MonoBehaviour
        
     }
 
+
     public void setFillPercent(float fillPercent)
     {
         progress = fillPercent;
         //Debug.Log("Bar value is now " + progress);
-        StartCoroutine(GradualChange());
+        slider.value = progress;
+        StartCoroutine(GradualFill());
     }
 
-    private IEnumerator GradualChange()
+    
+    private IEnumerator GradualFill()
     {
-        while (progress != slider.value)
+
+        float startFill = slider.value; //fill percent before change
+        float elapsedTime = 0;
+        while (Mathf.Abs(progress - slider.value) < fillThreashhold)
         {
-            slider.value += fillRate * Mathf.Sign(progress - slider.value);
-            yield return new WaitForFixedUpdate();
+            elapsedTime += Time.deltaTime;
+            float percentageComplete = elapsedTime / fillTime;
+            slider.value = Mathf.Lerp(startFill,progress, percentageComplete);
+            yield return new WaitForEndOfFrame();
         }
     }
-
-   // private IEnumerator 
-
+    
 }
+

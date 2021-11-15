@@ -16,6 +16,6 @@ public class GameManagment: MonoBehaviour
     public static void goToLoseScreen()
     {
         Debug.Log("You Lost!");
-        SceneManager.LoadScene("Lose Screen");
+        SceneManager.LoadScene("Main Menu");
     }
 }

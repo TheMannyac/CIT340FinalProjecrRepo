@@ -12,11 +12,9 @@ public class Health : MonoBehaviour
 
     private int currentHP;
 
-    private Collider2D collider;
-
     private void Awake()
     {
-        collider = GetComponent<Collider2D>();
+        //collider = GetComponent<Collider2D>();
     }
 
     // Start is called before the first frame update
@@ -45,11 +43,11 @@ public class Health : MonoBehaviour
 
 
         //apply change to current HP
-        currentHP = Mathf.Min(maxHP, currentHP - changeInHP);
+        currentHP = Mathf.Max(0, currentHP - changeInHP);
 
         if (_slider != null)
         {
-            _slider.GetComponent<SliderScript>().setFillPercent(currentHP / maxHP);
+            _slider.GetComponent<SliderScript>().setFillPercent((float)currentHP / maxHP);
         }
 
         //Object dies and returns true if it goes below 0
@@ -59,18 +57,43 @@ public class Health : MonoBehaviour
             return true;
         } else
         {
-            hitInvincibilty();
+            //hitInvincibilty();
 
             //otherwise returns false
             return false;
         }
     }
 
+    public bool HealDamage(int changeInHP)
+    {
+        //plays a hitsound if the object was attacked
+
+
+        //apply change to current HP
+        currentHP = Mathf.Min(maxHP, currentHP + changeInHP);
+
+        //update healthbar
+        if (_slider != null)
+        {
+            _slider.GetComponent<SliderScript>().setFillPercent((float)currentHP / maxHP);
+        }
+
+        //returns true if the health is maxed out
+        if(currentHP == maxHP)
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+       
+    }
+
     private IEnumerator hitInvincibilty()
     {
         float elapsedTime = 0;
         //disable colliders [THIS IS A HOT FIX, SHOULD FIX LATER TO AVOID STUFF CLIPPING OUT OF BOUNDS] 
-        collider.enabled = false;
+        //collider.enabled = false;
         Debug.LogWarning(name + "'s colliders have been disabled. You might wanna change this, dumbass");
 
         while (elapsedTime < invincibilityDuration)
@@ -81,7 +104,7 @@ public class Health : MonoBehaviour
 
         Debug.Log(name + "'s invincibility has ended");
         //re-enable colliders
-        collider.enabled = true;
+        //collider.enabled = true;
     }
 
 
@@ -92,7 +115,7 @@ public class Health : MonoBehaviour
             case "Player":
                 //return to main menu if the player dies
                 Debug.Log("the player has died");
-                //GameManagment.goToLoseScreen();
+                GameManagment.goToLoseScreen();
                 break;
               
         }

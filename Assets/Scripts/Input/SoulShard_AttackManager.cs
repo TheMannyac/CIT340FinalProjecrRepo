@@ -17,14 +17,8 @@ public class SoulShard_AttackManager : MonoBehaviour
     //General Fields
     [SerializeField] private State attackType;   //Shard's current attacking method
     public LayerMask enemyLayers;   //Types of objects that can be hit
-    [SerializeField] private int maxEnergy = 100;
-    [SerializeField] private int energyRegen = 2;
-    [SerializeField] private float secondsBetweenEnergyRegen = 1;
-    [SerializeField] private bool canRegenEnergy = true;
-    public Slider energySlider;
     public int energyCost = 10;
 
-    private int currentEnergy;
     
     //public Input input = Input.g 
 
@@ -43,14 +37,12 @@ public class SoulShard_AttackManager : MonoBehaviour
 
 
     //Misc
-    MonoBehaviour parentScript; //determines which shard this is [CHANGE THIS LATER]
-    MoveAndRotate moveScript;
+    MonoBehaviour parentScript; //determines which shard this is [CHANGE THIS LATE
     Animator anim;
     Rigidbody2D rb;
 
     private void Awake()
     {
-        moveScript = GetComponent<MoveAndRotate>();
 
        
     }
@@ -58,39 +50,10 @@ public class SoulShard_AttackManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Set max energy
-        currentEnergy = maxEnergy;
 
-        if(attackType == State.melee)
-        {
-            //if the object is a melee type, then it follows the mouse
-            moveScript.targetMouse = true;
-            moveScript.useActivationRange = false;
-            //moveScript.useFollowDistance = false;
-        }
 
-        if (energySlider == null)
-        {
-            Debug.LogWarning(gameObject.name + "does not have an energy slider attached");
-        }
-
-        //Set the energy bar to the current value
-        energySlider.GetComponent<SliderScript>().setFillPercent((float)currentEnergy / maxEnergy);
-        //begin passive energy regen
-        StartCoroutine(RegenEnergy());
     }
 
-    //called whenever game object is created or enabled
-    private void OnEnable()
-    {
-        
-    }
-
-    //called whenever game object is destroyed or disabled
-    private void OnDisable()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -105,29 +68,16 @@ public class SoulShard_AttackManager : MonoBehaviour
                     break;
                 case State.shooting:
                     //Scan for Attack input
-                    if (Input.GetAxis("Fire2") == 1) { Shoot(); }
+                    if (Input.GetAxis("Fire1") == 1) { Shoot(); }
                     break;
             }
         }
     }
 
-    private IEnumerator RegenEnergy()
-    {
-       //Debug.Log("Begin Health Regen");
-        while(true)
-        {
-            if(currentEnergy < maxEnergy && canFire)
-            {
-                //Debug.Log(gameObject.name + " regained " + energyRegen + " energy");
-                GainEnergy(energyRegen);
-            }
-            yield return new WaitForSeconds(secondsBetweenEnergyRegen);
-        }
-    }
 
     void Shoot()
     {
-        if (currentEnergy >= energyCost)
+        if (ShardManager.current.GetCurrentEnergy_Pathos() >= energyCost)
         {
             //Play Firing Sound Effect
             SoundManager.instance.PlaySound("firecracker");
@@ -147,28 +97,18 @@ public class SoulShard_AttackManager : MonoBehaviour
             canFire = false;
             Invoke("Attackooldown", 1 / currentFireRate);
 
-            //give other shard energy for dealing damage
-            if (isPathos())
-            {//[CHANGE THIS LATER]
-               GetComponent<Pathos>().ShardDealsDamage();
-            }
-            else
-            {
-              GetComponent<Logos>().ShardDealsDamage();
-            }
-
-            //Update energy value 
-            ConsumeEnergy(energyCost);
+            
+            ShardManager.current.LoseEnergy(energyCost, true);
         }
     }
 
     void Melee()
     {
-        if (currentEnergy >= energyCost)
+        if (ShardManager.current.GetCurrentEnergy_Logos() >= energyCost)
         {
             //Play Attack Animation
 
-            //SoundManager.instance.PlaySound("slash");
+            SoundManager.instance.PlaySound("slash");
 
             //Detect enemies within range
             Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
@@ -198,18 +138,9 @@ public class SoulShard_AttackManager : MonoBehaviour
             canFire = false;
             Invoke("Attackooldown", 1 / currentFireRate);
 
-            //give other shard energy for dealing damage [CHANGE THIS LATER]
-            if (isPathos())
-            {
-                GetComponent<Pathos>().ShardDealsDamage();
-            }
-            else
-            {
-                GetComponent<Logos>().ShardDealsDamage();
-            }
 
             //Update slider
-            ConsumeEnergy(energyCost);
+            ShardManager.current.LoseEnergy(energyCost,false);
         }
     }
     
@@ -235,30 +166,17 @@ public class SoulShard_AttackManager : MonoBehaviour
         canFire = true;
     }
 
-    private bool isPathos()
+    public void SwapAttack()
     {
-        if (attackType == State.melee)
-            return false;
+        if(attackType == State.melee)
+        {
+            attackType = State.shooting;
+        }
         else
-            return true;
+        {
+            attackType = State.melee;
+        }
     }
-
-    public void ConsumeEnergy(int energyCost)
-    {
-        currentEnergy = Mathf.Max(currentEnergy - energyCost, 0);
-        //Debug.Log(gameObject.name + "'s energy is now " + currentEnergy);
-        //Debug.Log(gameObject.name + "'s energy bar should be " + (float) currentEnergy/maxEnergy);
-
-        energySlider.GetComponent<SliderScript>().setFillPercent((float) currentEnergy / maxEnergy);
-    }
-
-   public void GainEnergy(int energyRegained)
-    {
-        currentEnergy = Mathf.Min(currentEnergy + energyRegained, maxEnergy);
-
-        energySlider.GetComponent<SliderScript>().setFillPercent((float)currentEnergy / maxEnergy);
-    }
-
     private void OnDrawGizmosSelected()
     {
         if (attackPoint == null)

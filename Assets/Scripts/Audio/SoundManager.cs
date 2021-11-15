@@ -35,6 +35,7 @@ public class SoundManager : MonoBehaviour
 
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
+            s.source.loop = s.loop;
         }
         //Initialize Music Tracks
         foreach (Sound s in musicTracks)
@@ -44,6 +45,7 @@ public class SoundManager : MonoBehaviour
 
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
+            s.source.loop = s.loop;
         }
     }
 
@@ -70,7 +72,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlayMusic(string trackName)
     {
-        Debug.Log("We are trying to play " + trackName);
+        //Debug.Log("We are trying to play " + trackName);
         Sound newSong = Array.Find(musicTracks, sound => sound.name == trackName);
         if (newSong == null)
         {

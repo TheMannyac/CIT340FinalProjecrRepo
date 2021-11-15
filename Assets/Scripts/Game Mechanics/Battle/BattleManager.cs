@@ -16,18 +16,27 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private BattleState battleState;
     //Singleton instance of BattleManager
     [HideInInspector] public static BattleManager instance;
+   
 
     [Header("Player Settings")]
     //position where the player will spawn and return to between turns.
     [SerializeField] private Vector2 playerBattleStation;
+    //
+    [HideInInspector] public bool playerTurn = true;
 
     [Header("Enemy Settings")]
+    //The maximum number of enemies that can be in any given encounter 
+    [SerializeField] public static int maxEncounterSize = 3;
     //The template for the current encounter 
     [SerializeField] private Encounter currentEncounter;
     //positions that enemies will spawn and return to between turns.
-    [SerializeField] private Vector2[] enemyBattleStations = new Vector2[3];
+    [SerializeField] private Vector2[] enemyIdlePositions = new Vector2[maxEncounterSize];
+    //where enemies will start in the arena at the begining of their turn
+    [SerializeField] private Vector2[] enemyArenaPositions = new Vector2[maxEncounterSize];
     //Contains the instances of all enemies in the battle
-    [HideInInspector] private Enemy_BattleScene[] currentEnemies = new Enemy_BattleScene[3];
+    [HideInInspector] private Enemy_BattleScene[] currentEnemies = new Enemy_BattleScene[maxEncounterSize];
+    //(In seconds) how long the current enemy turn has lasted 
+    [HideInInspector] float elapsedTime = 0;
 
     private void Awake()
     {
@@ -55,9 +64,10 @@ public class BattleManager : MonoBehaviour
             {
                 //spawns enemy at their assigned Battle station
                 Enemy_BattleScene baddie = Instantiate(enem,
-                                            enemyBattleStations[i], Quaternion.identity);
+                                            enemyIdlePositions[i], Quaternion.identity);
                 //Make any needed additions or alterations to the enemy's datafields
-                baddie.battleStation = enemyBattleStations[i];
+                baddie.idlePosition = enemyIdlePositions[i];
+                baddie.arenaPosition = enemyArenaPositions[i];
 
                 //Stores an instance of the newly spawned enemy
                 currentEnemies[i] = baddie;
@@ -70,6 +80,7 @@ public class BattleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //TODO remove the "playerTurn" jank 
         switch (battleState)
         {
             case BattleState.Start: //Initialize battle
@@ -82,21 +93,22 @@ public class BattleManager : MonoBehaviour
                     break;
             case BattleState.PlayerTurn:  //This is when the player selects actions in the menu
                 Debug.Log("its now the player's turn");
+                playerTurn = true;
                 break;
             case BattleState.EnemyTurn:
-
+                playerTurn = false;
                 break;
             case BattleState.Banter:      //Time in between turns that characters have dialog conversations
+                playerTurn = false;
                 break;
             case BattleState.End:   //Stuff to do before we return to the overworld
                 break;
         }
     }
-
     private IEnumerator enemyTurnDuration()
     {
         Debug.Log("Enemy Turn has begun");
-        float elapsedTime = 0;
+        elapsedTime = 0;
         while (elapsedTime < currentEncounter.attackDuration)
         {
             elapsedTime += Time.deltaTime;
@@ -104,6 +116,16 @@ public class BattleManager : MonoBehaviour
         }
         //after attack has ended got back to player's turn
         SetBattleState(BattleState.PlayerTurn);
+    }
+
+    public float getEnemyTurnTimer()
+    {
+        if(battleState != BattleState.EnemyTurn)
+        {
+            Debug.LogWarning("Function was called when not enemy turn");
+            return 0;
+        } else
+            return elapsedTime;
     }
 
     //Allows for the battle state to be manually changed
@@ -117,7 +139,7 @@ public class BattleManager : MonoBehaviour
 
         if (battleState == BattleState.EnemyTurn)
         {
-            if(OnEnemyTurnExit != null)
+            if (OnEnemyTurnExit != null)
             {
                 Debug.Log("OnEnemyTurnExit event has fired");
                 OnEnemyTurnExit();
@@ -129,14 +151,14 @@ public class BattleManager : MonoBehaviour
         {
             case BattleState.Start: 
                 break;
-            case BattleState.PlayerTurn: 
+            case BattleState.PlayerTurn:
                 //Activate 
                 break;
             case BattleState.EnemyTurn:
                 //Let everyone know that we're about to fight
                 if (OnEnemyTurnEnter != null)
                 {
-                    Debug.Log("OnEnemyTurnEnter has fired");
+                   // Debug.Log("OnEnemyTurnEnter has fired");
                     OnEnemyTurnEnter();
                 }
                 StartCoroutine(enemyTurnDuration());
@@ -179,7 +201,7 @@ public class BattleManager : MonoBehaviour
             OnEnemyTurnExit();
         }
     }
-    
+ 
     private void OnDestroy()
     {
         //removes instance of this object from the static variable
@@ -191,8 +213,10 @@ public class BattleManager : MonoBehaviour
         Gizmos.DrawCube(playerBattleStation, new Vector3 (.5f,.5f, .5f));
 
         //Draw Battle Positions of enemies 
-        foreach (Vector2 battlePos in enemyBattleStations)
+        foreach (Vector2 battlePos in enemyIdlePositions)
             Gizmos.DrawSphere(battlePos, .25f);
+        foreach (Vector2 battlePos in enemyArenaPositions)
+            Gizmos.DrawSphere(battlePos, .35f);
     }
 
     /// <summary>

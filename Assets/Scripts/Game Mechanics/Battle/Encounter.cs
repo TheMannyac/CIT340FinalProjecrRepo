@@ -7,7 +7,7 @@ public class Encounter
 {
     //Hook in prefabs with that contain the "Enemy" script to create an encounter
     //Can only have up to 3 enemies per encounter
-    public Enemy_BattleScene[] pfEnemiesInEncounter = new Enemy_BattleScene[3];
+    public Enemy_BattleScene[] pfEnemiesInEncounter = new Enemy_BattleScene[BattleManager.maxEncounterSize];
 
     //CHANGE LATER
     public float attackDuration = 6f;

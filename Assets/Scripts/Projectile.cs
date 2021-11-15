@@ -21,8 +21,9 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == targetLayer )
+        if (collision.gameObject.tag == "Player" )
         {
+            Debug.Log(collision.name + " was hit");
             collision.GetComponent<Health>().takeDamage(damage);
         }
 
