@@ -2,49 +2,59 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class explosion : MonoBehaviour
+public class explosion : Projectile
 {
-    public int damage = 25;
-    public float knockbackPower = 8;
+    //public float knockbackPower = 8;
 
+    [Header("Scatter Burst")]
+    public Projectile pellotPF;
+    public int pellotNum = 8;
+
+    SpriteRenderer spr;
+    Collider2D hitbox;
     Animator animator;
 
     private void Awake()
     {
+        hitbox = GetComponent<Collider2D>();
+        spr = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
     }
 
-    private void Start()
+    protected override void Start()
     {
-        SoundManager.instance.PlaySound("squish");
+        base.Start();
+        SoundManager.instance.PlaySound("Small Explosion");
+        Projectile.ScatterBurstAttack(pellotPF, transform.position, pellotNum,Vector2.up,358);
     }
 
+    
 
     // Update is called once per frame
     void Update()
     {
         if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
         {  //If normalizedTime is 0 to 1 means animation is playing, if greater than 1 means finished
-            Debug.Log("not playing");
+            //Debug.Log("not playing");
 
+            //make invisible and 
+            //spr.enabled = false;
+            //hitbox.enabled = false;
             Destroy(gameObject);
         }
         else
         {
-            Debug.Log("playing");
+            //Debug.Log("playing");
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected override void Move()
     {
-        if(collision.gameObject.CompareTag("Player"))
-        {
-            collision.GetComponent<Health>().takeDamage(damage);
-            Rigidbody2D enemyRB = collision.GetComponent<Rigidbody2D>();
-  
-            Vector2 dir = ((collision.transform.position - this.transform.position).normalized) * knockbackPower;
-            enemyRB.AddForce(dir, ForceMode2D.Impulse);
+        //base.Move();
+    }
 
-        }
+    protected override void OnTriggerEnter2D(Collider2D collision)
+    {
+       //overrideen
     }
 }

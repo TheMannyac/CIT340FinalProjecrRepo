@@ -6,7 +6,11 @@ public class SoundManager : MonoBehaviour
 {
     [SerializeField] private Sound[] sounds;
     [SerializeField] private Sound[] musicTracks;
+
+
+    public bool StartMusicOnLOad = true;
     public string playOnLoad;
+
 
     Sound currentTrack;
 
@@ -19,11 +23,20 @@ public class SoundManager : MonoBehaviour
         else
         {
             //Play this room's theme before destroying object
-            instance.PlayMusic(playOnLoad);
-            Destroy(gameObject);
+            if (this.StartMusicOnLOad)
+            {
+                instance.PlayMusic(this.playOnLoad);
+            } else
+            {
+                instance.PauseMusic();
+                instance.playOnLoad = this.playOnLoad;
+            }
+
+            Destroy(this);
             Debug.Log("SOUNDMANAGER DESTROYED");
-            return;
+            return;   
         }
+
 
         //The audio manager persists between scenes
         DontDestroyOnLoad(gameObject);
@@ -51,7 +64,8 @@ public class SoundManager : MonoBehaviour
 
     private void Start()
     {
-        PlayMusic(playOnLoad);
+        if(StartMusicOnLOad)
+            PlayMusic(playOnLoad);
     }
 
      void Update()
@@ -85,11 +99,25 @@ public class SoundManager : MonoBehaviour
         } else
         {
             if (currentTrack != null && currentTrack.source.isPlaying)
+            {
                 currentTrack.source.Stop();
+            }
 
             currentTrack = newSong;
             currentTrack.source.Play();
         }
     }
 
+    public void PauseMusic()
+    {
+        if (currentTrack != null && currentTrack.source.isPlaying)
+        {
+            currentTrack.source.Pause();
+        }
+    }
+
+    internal static void playMusic(string v)
+    {
+        throw new NotImplementedException();
+    }
 }

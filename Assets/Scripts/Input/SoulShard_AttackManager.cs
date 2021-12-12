@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
+/*
 //TODO split this into its own thing
 public class SoulShard_AttackManager : MonoBehaviour
 {
-
+    /*
     //State Machine
     private enum State
     {
@@ -77,6 +77,7 @@ public class SoulShard_AttackManager : MonoBehaviour
 
     void Shoot()
     {
+
         if (ShardManager.current.GetCurrentEnergy_Pathos() >= energyCost)
         {
             //Play Firing Sound Effect
@@ -98,7 +99,7 @@ public class SoulShard_AttackManager : MonoBehaviour
             Invoke("Attackooldown", 1 / currentFireRate);
 
             
-            ShardManager.current.LoseEnergy(energyCost, true);
+            //ShardManager.current.LoseEnergy(energyCost, false);
         }
     }
 
@@ -133,8 +134,8 @@ public class SoulShard_AttackManager : MonoBehaviour
                 Vector2 dir = ((enemy.transform.position - this.transform.position).normalized) * knockbackPower;
                 enemyRB.AddForce(dir, ForceMode2D.Impulse);
                 */
-            }
-
+          //  }
+          /*
             canFire = false;
             Invoke("Attackooldown", 1 / currentFireRate);
 
@@ -143,7 +144,7 @@ public class SoulShard_AttackManager : MonoBehaviour
             ShardManager.current.LoseEnergy(energyCost,false);
         }
     }
-    
+    */
     /*
     public IEnumerator Knockback(float knockbackDuration, Transform obj)
     {
@@ -160,7 +161,7 @@ public class SoulShard_AttackManager : MonoBehaviour
         yield return 0;
     }
     */
-
+    /*
     void Attackooldown()
     {
         canFire = true;
@@ -184,5 +185,6 @@ public class SoulShard_AttackManager : MonoBehaviour
 
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
-
+    
 }
+    */

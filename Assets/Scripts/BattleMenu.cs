@@ -2,101 +2,111 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
-
-public class BattleMenu : MonoBehaviour
-{
-    private enum State
+    public enum MenuDisplayState
     {
         Neutral, ItemMenu, ActMenu, RunMenu, Disabled 
     }
 
+public class BattleMenu : MonoBehaviour
+{
 
-    private State displaying;
+    //Singleton Pattern\\
+    /* ================================================
+     *   Create object if not already in scene:     false
+     *  Remove scene dupes:                          true
+     *  Global access                                 true
+     *  Keep across game scene loads                  false
+     * =========================================================
+     */
+
+    private static BattleMenu instance;
+
+    /// <summary>
+    /// THe current singleton of the battlemanager 
+    /// </summary>
+    public static BattleMenu Instance { get { return instance; } }
+    public bool UsedItem = false;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
+    }
+
+    [SerializeField] private MenuDisplayState Displaying = MenuDisplayState.Neutral;
+    public MenuDisplayState displaying
+    {
+        get { return Displaying; }
+        protected set
+        {
+            if (Displaying == value) return;
+
+            switch (value)
+            {
+                case MenuDisplayState.Neutral:
+
+                    break;
+            }
+        }
+
+    } 
+
     public List<Button> menuButtons = new List<Button>();
     //public Tree<int> menuTree; 
 
     SpriteRenderer sr;
-
+    
     // Start is called before the first frame update
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
+        UsedItem = false;
 
-        displaying = State.Neutral;
     }
-
-    // Update is called once per frame
-    void Update()
+    private void OnEnable()
     {
-        switch (displaying)
-        {
-            case State.Neutral:
-                break;
-            case State.ActMenu:
-                break;
-            case State.ItemMenu:
-                break;
-            case State.Disabled:
-                break;
-        }
-
-        if (BattleManager.instance.playerTurn)
-        {
-            foreach(Button butt in menuButtons)
-            {
-                butt.interactable = true;
-            }
-        }
-        else
-        {
-            foreach (Button butt in menuButtons)
-            {
-                butt.interactable = true;
-            }
-            displaying = State.Disabled;
-        }
+        displaying = MenuDisplayState.Neutral;
     }
 
     //called when the fight button is pressed
     public void Fight()
     {
-        Debug.Log("FIGHT Button pressed");
-        displaying = State.Disabled;
-        BattleManager.instance.endTurn();
+       // Debug.Log("FIGHT Button pressed");
+        displaying = MenuDisplayState.Disabled;
+        BattleManager.instance.endPlayerTurn();
     }
-    public void Act()
+    public void Swap()
     {
-        Debug.Log("ACT Button Pressed");
-        displaying = State.ActMenu;
+        //Debug.Log("ACT Button Pressed");
+
+        displaying = MenuDisplayState.ActMenu;
     }
     public void Item()
     {
         Debug.Log("ITEM Button Pressed");
-        displaying = State.ItemMenu;
+        if(UsedItem == false)
+        {
+            Stylo.Heal(30);
+            SoundManager.instance.PlaySound("heal");
+            UsedItem = true;
+        } else
+        {
+            SoundManager.instance.PlaySound("squish");
+            if(Random.value >= .75f)
+            {
+                SoundManager.instance.PlaySound("chuckle");
+            }
+        }
     }
     public void Run()
     {
         Debug.Log("RUN Button Pressed");
-        displaying = State.RunMenu;
-    }
-   
-    //TEMPORARY
-    public void RefillLogos()
-    {
-        Debug.Log("Logos energy UP!!");
-        ShardManager.current.GainEnergy(20,false);
-    }
-
-    public void RefillPathos()
-    {
-        Debug.Log("Pathos energy UP!!");
-        ShardManager.current.GainEnergy(20, true);
-    }
-
-    public void HealingPotion()
-    {
-        Debug.Log("Health up!!");
-        GameObject player = GameObject.Find("Player");
-        player.GetComponent<Health>().HealDamage(30);
+        GameManagment.goToMenu();
     }
 }

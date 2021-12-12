@@ -39,13 +39,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1189646966188055458}
+  - component: {fileID: 6892845839171467218}
   - component: {fileID: 1189646966188055462}
   - component: {fileID: 1189646966188055129}
   - component: {fileID: 1189646966188055463}
-  - component: {fileID: 4210969681464909150}
-  - component: {fileID: 2368749752963936897}
   m_Layer: 7
-  m_Name: Pathos
+  m_Name: Active Shard
   m_TagString: Ally
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -66,6 +65,20 @@ Transform:
   m_Father: {fileID: 1189646966204608617}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6892845839171467218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1189646966188055459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be130835bfb5c6d41a8c37efbb71e4ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Logos_ProjPF: {fileID: 1242212038559807551, guid: 61966b146653f8541a75771b1626afa7, type: 3}
+  Pathos_ProjPF: {fileID: 1242212038559807551, guid: 61966b146653f8541a75771b1626afa7, type: 3}
 --- !u!212 &1189646966188055462
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -108,7 +121,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.4965839, g: 0.2980392, b: 0.8980392, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -165,36 +178,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &4210969681464909150
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1189646966188055459}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d92dc66b926793f4dab499d458060ca4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isPathos: 1
---- !u!114 &2368749752963936897
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1189646966188055459}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9a6cb30455029c4a8d465d2c333fa67, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxEnergy_Logos: 100
-  currenEnergy_Logos: 0
-  LogosEnergyBar: {fileID: 0}
-  maxEnergy_Pathos: 100
-  PathosEnergyBar: {fileID: 0}
 --- !u!1 &1189646966204608630
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,8 +239,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1189646966417286744}
   - component: {fileID: 1189646966417286745}
+  - component: {fileID: 5282395535659034516}
   - component: {fileID: 1189646966417287078}
-  - component: {fileID: 4063094167972218138}
   - component: {fileID: 1189646966417287079}
   - component: {fileID: 1189646966417287076}
   m_Layer: 7
@@ -334,6 +317,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5282395535659034516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1189646966417287077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff468f3ff1a5d3249a8de53bd319ec23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1189646966417287078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,25 +341,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1eea06c24136b26498382c6f20ddae05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 4.5
+  moveSpeed: 6
+  frozen: 0
   shouldFlipDirection: 0
   HasAnimator: 0
---- !u!114 &4063094167972218138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1189646966417287077}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6c4960921821614e963d4c719465627, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHP: 100
-  hasInvincibilityFrames: 1
-  invincibilityDuration: 1.5
-  _slider: {fileID: 0}
 --- !u!50 &1189646966417287079
 Rigidbody2D:
   serializedVersion: 4

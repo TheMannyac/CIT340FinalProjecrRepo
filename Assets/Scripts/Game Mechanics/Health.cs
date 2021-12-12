@@ -115,7 +115,7 @@ public class Health : MonoBehaviour
             case "Player":
                 //return to main menu if the player dies
                 Debug.Log("the player has died");
-                GameManagment.goToLoseScreen();
+                //GameManagment.goToLoseScreen();
                 break;
               
         }

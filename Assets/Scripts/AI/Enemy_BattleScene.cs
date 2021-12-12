@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,6 @@ public class Enemy_BattleScene : MonoBehaviour
 
     [SerializeField] protected State myState;
     
-
     [Header("Stats")]
     [SerializeField] protected int maxHP; 
     [HideInInspector] protected int currentHP;
@@ -52,9 +52,10 @@ public class Enemy_BattleScene : MonoBehaviour
         //All Enemies with this script must have the Enemies Layer mask
         gameObject.layer = LayerMask.NameToLayer("Enemies");
         
+        //BattleManager.instance.battleState
         //Makes sure that we always know who's turn it is
         BattleManager.instance.OnEnemyTurnEnter += OnEnemyTurnEnter;
-        BattleManager.instance.OnEnemyTurnExit += OnEnemyTurnExit;
+        BattleManager.instance.OnPlayerTurnEnter += OnPlayerTurnEnter;
     }
 
     //Determines how this enemy will attack next 
@@ -93,7 +94,7 @@ public class Enemy_BattleScene : MonoBehaviour
     }
 
     //called when the battle manager lets us know when we end our turn.
-    protected virtual void OnEnemyTurnExit()
+    protected virtual void OnPlayerTurnEnter()
     {
         //Go back to idling
         myState = State.Idle;
@@ -106,7 +107,7 @@ public class Enemy_BattleScene : MonoBehaviour
     }
 
     //Restores the health of a character 
-    public void HealDamage(int healing)
+    public virtual void HealDamage(int healing)
     {
         //Play visual/audio effects
 
@@ -117,7 +118,7 @@ public class Enemy_BattleScene : MonoBehaviour
         healthBar.GetComponent<SliderScript>().setFillPercent((float)currentHP / maxHP);
     }
 
-    public void TakeDamage(int damage)
+    public virtual void TakeDamage(int damage)
     {
         //Play visual/Audio Effects
 
@@ -134,11 +135,19 @@ public class Enemy_BattleScene : MonoBehaviour
             Die();
         }
     }
-
+    /// <summary>
+    /// This event fires whenever the enemy dies; used to notify battleManager
+    /// </summary>
+    public Action OnEnemyDeath;
     //called when this enemy's HP reaches zero
     protected virtual void Die()
     {
         //Play any relevant effects
+
+        if(OnEnemyDeath != null)
+        {
+            OnEnemyDeath();
+        }
 
         //Destroy the game Object
         Destroy(gameObject);

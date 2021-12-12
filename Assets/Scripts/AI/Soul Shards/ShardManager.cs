@@ -4,108 +4,87 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 
-public class ShardManager : MonoBehaviour
+public enum SoulShards
 {
-
-    [Header("Logos Settings")]
-    [SerializeField] private int maxEnergy_Logos = 100;
-    public int currenEnergy_Logos;
-    public Slider LogosEnergyBar;
-
-    [Header("Pathos Settings")]
-    [SerializeField]private int maxEnergy_Pathos = 100;
-    private int currenEnergy_Pathos;
-    public Slider PathosEnergyBar;
-
-    public static ShardManager current;
-    private void Awake()
-    {
-         if(PathosEnergyBar == null)
-        {
-            Debug.LogError("Pathos energy bar not given to shard manager");
-        }
-        if (LogosEnergyBar == null)
-        {
-            Debug.LogError("Logos energy bar not given to shard manager");
-        }
-    }
-
-    private void Start()
-    {
-        if(current == null)
-        {
-            current = this;
-        } else
-        {
-            Debug.LogWarning(name + "'s shard Manager component has been destroyed!!");
-            Destroy(this);
-            return;
-        }
-
-        currenEnergy_Logos = maxEnergy_Logos;
-        currenEnergy_Pathos  = maxEnergy_Logos;
-
-        LogosEnergyBar.GetComponent<SliderScript>().setFillPercent((float)currenEnergy_Pathos / maxEnergy_Pathos);
-        LogosEnergyBar.GetComponent<SliderScript>().setFillPercent((float)currenEnergy_Logos / maxEnergy_Logos);
-    }
-    //public static bool activeShardIsPathos = true;
-
-    //Reference to the current shard that is active
-    //public static SoulShard_Battle_Active activeShard;
-    //Reference to the shard that is 
-    //public static SoulShard_Battle_Assist assistShard;
-
-    public static event Action OnSwapActiveShard;
-    public static void SwapActiveShard()
-    {
-        if(OnSwapActiveShard != null)
-        {
-            Debug.Log("Active Shard is now swapped");
-            OnSwapActiveShard();
-        }
-    }
-   
-
-    //THIS IS SLOPPY, WE'LL CHANGE THIS LATER
-    public void GainEnergy(int energyGain, bool isPathos)
-    {
-        if (isPathos)
-        {
-            currenEnergy_Logos = Mathf.Min(currenEnergy_Pathos + energyGain, maxEnergy_Pathos);
-
-            LogosEnergyBar.GetComponent<SliderScript>().setFillPercent((float) currenEnergy_Pathos/maxEnergy_Pathos);
-        } 
-        else
-        {
-            currenEnergy_Logos = Mathf.Min(currenEnergy_Pathos + energyGain, maxEnergy_Pathos);
-
-            LogosEnergyBar.GetComponent<SliderScript>().setFillPercent((float)currenEnergy_Logos / maxEnergy_Logos);
-        }
-    }
-
-    public void LoseEnergy(int energyCost, bool isPathos)
-    {
-        if (isPathos)
-        {
-            currenEnergy_Logos = Mathf.Max(currenEnergy_Pathos - energyCost, maxEnergy_Pathos);
-
-            LogosEnergyBar.GetComponent<SliderScript>().setFillPercent((float)currenEnergy_Pathos / maxEnergy_Pathos);
-        }
-        else
-        {
-            currenEnergy_Logos = Mathf.Min(currenEnergy_Pathos + energyCost, maxEnergy_Pathos);
-
-            LogosEnergyBar.GetComponent<SliderScript>().setFillPercent((float)currenEnergy_Logos / maxEnergy_Logos);
-        }
-    }
-
-    public int GetCurrentEnergy_Logos()
-    {
-        return currenEnergy_Logos;
-    }
-
-    public int GetCurrentEnergy_Pathos()
-    {
-        return currenEnergy_Pathos;
-    }
+    none,pathos,logos
 }
+
+public interface IHasEnergy
+{
+    /// <summary>
+    /// The max amount of energy this shard can have at any given time
+    /// </summary>
+    abstract float MaxEnergy { get;  set; }
+    /// <summary>
+    /// The amount of energy that the object currently has
+    /// </summary>
+    abstract float CurrentEnergy { get; set; }
+
+    /// <summary>
+    /// Cleanly sets current energy back to max
+    /// </summary>
+    void ResetEnergy();
+    /// <summary>
+    /// Adds a certain amount of energy back to the current energy value, but (probably) doesn't let it go over
+    /// </summary>
+    /// <param name="energy"> amount of energy being added</param>
+    void GainEnergy(float energy);
+    /// <summary>
+    /// Removes a certain amount of energy from current energy value, but never should go below zero;
+    /// </summary>
+    /// <param name="energy">amount of energy being removed</param>
+    void DrainEnergy(float energy);
+    /// <summary>
+    /// Returns a decimal value representing the percentage of current energy/max energy
+    /// </summary>
+    /// <returns>energy fill percent</returns>
+    float GetEnergyPercent();
+}
+public static class ShardManager
+{
+    private static SoulShards _ActiveShard = SoulShards.logos;
+    /// <summary>
+    /// The currently active shard
+    /// </summary>
+    public static SoulShards ActiveShard {
+        get { return _ActiveShard; }
+        private set
+        {
+            if (value == _ActiveShard)
+                return;
+
+            switch (value)
+            {
+                case SoulShards.logos:
+                    InactiveShard = SoulShards.pathos;
+                    break;
+                case SoulShards.pathos:
+                    InactiveShard = SoulShards.logos;
+                    break;
+                case SoulShards.none:
+                    InactiveShard = SoulShards.none;
+                    break;
+            }
+
+            _ActiveShard = value;
+        }
+    }
+    /// <summary>
+    /// The Soul shard that is current inactive and is on standby
+    /// </summary>
+    public static SoulShards InactiveShard { get; private set; }
+
+    /// <summary>
+    /// The active shard and the inactive shard swap places
+    /// </summary>
+    public static void swapActiveShard()
+    {
+        //can only swap between Pathos and Logos
+        if (ActiveShard == SoulShards.none) { return; }
+
+        ActiveShard = InactiveShard;
+    }
+
+}
+
+

@@ -19,6 +19,11 @@ public class DialougeManager : MonoBehaviour
    
     }
 
+    private void OnEnable()
+    {
+        sentences = new Queue<string>();
+    }
+
     public void StartDialouge(Dialouge dialouge)
     {
         animator.SetBool("IsOpen", true);
@@ -54,10 +59,11 @@ public class DialougeManager : MonoBehaviour
     {
         dialougeText.text = "";
 
-        foreach(char letter in sentence.ToCharArray())
+        foreach (char letter in sentence.ToCharArray())
         {
+            SoundManager.instance.PlaySound("text");
             dialougeText.text += letter;
-            yield return null;
+            yield return new WaitForSeconds(.04f);
 
         }
     }
@@ -65,7 +71,21 @@ public class DialougeManager : MonoBehaviour
     public void EndDialouge()
     {
         animator.SetBool("IsOpen", false);
+        StartCoroutine(EndGameFadeOut());
         Debug.Log("End of conversation");
+    }
+
+    private IEnumerator EndGameFadeOut()
+    {
+        //Create Dramatic black screen at the start that covers everything
+        DramaticScreen bg = Instantiate(GameManagment.Instance.dramaScreePF, new Vector2(3, -23), Quaternion.identity);
+        bg.onLoadCommand = DramaticScreen_OnLoadCommands.FadeIn;
+        bg.gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "UI";
+        bg.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 20;
+
+        yield return new WaitForSeconds(2.5f);
+        GameManagment.ExitGame();
+
     }
 
 }

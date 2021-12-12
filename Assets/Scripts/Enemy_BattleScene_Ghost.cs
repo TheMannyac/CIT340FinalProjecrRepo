@@ -25,7 +25,6 @@ public class Enemy_BattleScene_Ghost : Enemy_BattleScene
         base.Awake();
         //Retrieve all the components
         WaypointMan = GetComponent<WaypointManager>();
- 
     }
 
     // Start is called before the first frame update
@@ -72,10 +71,10 @@ public class Enemy_BattleScene_Ghost : Enemy_BattleScene
         base.OnEnemyTurnEnter();
     }
 
-    protected override void OnEnemyTurnExit()
+    protected override void OnPlayerTurnEnter()
     {
-        Debug.Log(name + " knows that its turn has ended");
-        base.OnEnemyTurnExit();
+        //Debug.Log(name + " knows that its turn has ended");
+        base.OnPlayerTurnEnter();
 
     }
 
@@ -85,7 +84,7 @@ public class Enemy_BattleScene_Ghost : Enemy_BattleScene
         //Begin attack [DO NOT KEEP THIS]
         if (shotTimer > attackRate)
         {
-
+           
             Instantiate(bulletPrefab,transform.position,Quaternion.identity);
             //bullet.GetComponent<Projectile>().targetLayer = 
             shotTimer = 0;

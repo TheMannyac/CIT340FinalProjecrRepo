@@ -31,7 +31,7 @@ public class Timer : MonoBehaviour
             //makes sure timer does not go below 0;
             timeValue = 0;
             Debug.Log("time has run out");
-            GameManagment.goToLoseScreen();
+            //GameManagment.goToLoseScreen();
             //Invoke("GameManagement.goToMenu", .5f);
 
         }

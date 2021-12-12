@@ -74,9 +74,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1263841323
   m_SortingLayer: 2
-  m_SortingOrder: 1
+  m_SortingOrder: 5
   m_Sprite: {fileID: 2154697797156516133, guid: 88e369355c49d324ea7371f22a7b35eb, type: 3}
-  m_Color: {r: 0.6074108, g: 0.9528302, b: 0.6058562, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -114,8 +114,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7809ba7451b170f40973f0b4fe57ded0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 25
-  knockbackPower: 8
+  damage: 15
+  speed: 0
+  alignment: 2
+  pellotPF: {fileID: -3511738982070858528, guid: 32387b696e856754796f68a891910bbb, type: 3}
+  pellotNum: 8
 --- !u!95 &1440187754939887974
 Animator:
   serializedVersion: 3

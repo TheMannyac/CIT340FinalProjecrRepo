@@ -7,6 +7,7 @@ public class PlayerControls: MonoBehaviour
 {
     ///Public data fields
     public float moveSpeed = 4.5f;   //movement speed of the player
+    public bool frozen = false;
     public bool shouldFlipDirection = true;
     [SerializeField] private bool HasAnimator = true;
     
@@ -54,7 +55,7 @@ public class PlayerControls: MonoBehaviour
         moveDirection = new Vector2(inputX, inputY);
         
         moveDirection.Normalize();
-
+        //animator stuff will try to offload this to another script later
         if (HasAnimator)
         {
             animator.SetFloat("Horizontal", inputX);
@@ -77,8 +78,10 @@ public class PlayerControls: MonoBehaviour
     //use fixed update to avoid jitter when objects are moving into one another
     void FixedUpdate()
     {
-        //Movement and physics
-        move();
+        if(frozen == false)
+        {
+            move();
+        }
         
     }
 

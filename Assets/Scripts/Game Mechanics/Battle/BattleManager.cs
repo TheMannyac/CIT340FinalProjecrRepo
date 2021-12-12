@@ -3,28 +3,108 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/** 
+ * 
+ * The intended order of battle is to go like this:===========
+ * START, 
+ * PLAYER TURN, BANTER (optiona;), FIGHT PAHSE, .... (repeat)
+ * END
+ * =========================================================
+ */
+
+public enum BattleState
+{
+    Start, PlayerTurn, FightPhase,
+    Banter, End
+}
+
 public class BattleManager : MonoBehaviour
 {
-    private enum BattleState
+    //Singleton Pattern\\
+    /* ================================================
+     *   Create object if not already in scene:     false
+     *  Remove scene dupes:                          true
+     *  Global access                                 true
+     *  Keep across game scene loads                  true
+     * =========================================================
+     */
+    
+    public static BattleManager instance;
+
+    /// <summary>
+    /// THe current singleton of the battlemanager 
+    /// </summary>
+    public static BattleManager Instance { get { return instance; } }
+
+
+    private void Awake()
     {
-        Start, PlayerTurn, EnemyTurn,
-        Banter,End
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
     }
 
-    [Header("BattleManager Settings")]
-    //Current State of the battle
-    [SerializeField] private BattleState battleState;
+    private BattleState _battleState = BattleState.PlayerTurn;
+    /// <summary>
+    /// Current battle state
+    /// </summary>
+    [SerializeField] public BattleState battleState {
+        //anyone can check the battlestate current
+        //but only the battleManager can change it
+        get { return _battleState; }
+        protected set
+        {
+            //Don't execute anything else if we're out 
+            if (_battleState == value)
+                return;
+            //Debug.Log("State is going from " + _battleState + " to " + value);
+
+            switch (value)
+            {
+                case BattleState.Start:
+                    StartCoroutine(BattleStartCutscene());
+                    break;
+                case BattleState.PlayerTurn:
+                    PlayerTurnEnter();
+                    break;
+                case BattleState.FightPhase:
+                    EnemyTurnEnter();
+                    break;
+                case BattleState.Banter:
+                    BanterEnter();
+                    break;
+                case BattleState.End:
+                    GameManagment.goToMenu();
+                    break;
+            }
+
+            //reset state timer
+            stateTimer = 0;
+
+            _battleState = value;
+        }
+    }
     //Singleton instance of BattleManager
-    [HideInInspector] public static BattleManager instance;
    
 
     [Header("Player Settings")]
     //position where the player will spawn and return to between turns.
-    [SerializeField] private Vector2 playerBattleStation;
+    [SerializeField] private Vector2 ArenaSpawn;
+    [SerializeField] private GameObject arenaPF; 
+    private GameObject arena;
     //
-    [HideInInspector] public bool playerTurn = true;
 
     [Header("Enemy Settings")]
+    //How long the fight phase lasts
+    public float fightDuration = 10;
+    private float defaultFightDuration;
+    //(In seconds) how long the current state has lasted 
+    [HideInInspector] float stateTimer= 0;
     //The maximum number of enemies that can be in any given encounter 
     [SerializeField] public static int maxEncounterSize = 3;
     //The template for the current encounter 
@@ -35,23 +115,11 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Vector2[] enemyArenaPositions = new Vector2[maxEncounterSize];
     //Contains the instances of all enemies in the battle
     [HideInInspector] private Enemy_BattleScene[] currentEnemies = new Enemy_BattleScene[maxEncounterSize];
-    //(In seconds) how long the current enemy turn has lasted 
-    [HideInInspector] float elapsedTime = 0;
-
-    private void Awake()
-    {
-        //ensures there is only one battle manager at a time
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Debug.LogWarning("BATTLEMANAGER DESTROYED");
-            Destroy(gameObject);
-            return;
-        }
-    }
+    /// <summary>
+    /// The number of the current battleround 
+    /// </summary>
+    public int battleRound { get; protected set; }
+    public object OnEnterBanter { get; internal set; }
 
     // Start is called before the first frame update
     void Start()
@@ -73,134 +141,133 @@ public class BattleManager : MonoBehaviour
                 currentEnemies[i] = baddie;
             }
         }
- 
+
+        defaultFightDuration = fightDuration;
+        battleRound = -1;
         battleState = BattleState.Start;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        //TODO remove the "playerTurn" jank 
-        switch (battleState)
-        {
-            case BattleState.Start: //Initialize battle
-                //Play any necesary animations or sound effects
-                //Debug.Log("Battle Start");
-                //Display Opening Dialouge
+        //timer increases gradually
+        stateTimer += Time.deltaTime;
 
-                //Move on to Player's turn
-                    SetBattleState(BattleState.PlayerTurn);
-                    break;
-            case BattleState.PlayerTurn:  //This is when the player selects actions in the menu
-                Debug.Log("its now the player's turn");
-                playerTurn = true;
-                break;
-            case BattleState.EnemyTurn:
-                playerTurn = false;
-                break;
-            case BattleState.Banter:      //Time in between turns that characters have dialog conversations
-                playerTurn = false;
-                break;
-            case BattleState.End:   //Stuff to do before we return to the overworld
-                break;
-        }
-    }
-    private IEnumerator enemyTurnDuration()
-    {
-        Debug.Log("Enemy Turn has begun");
-        elapsedTime = 0;
-        while (elapsedTime < currentEncounter.attackDuration)
+        if (battleState == BattleState.FightPhase)
         {
-            elapsedTime += Time.deltaTime;
-            yield return null;
+            //Debug.Log("fight timer is up");
+            if (stateTimer >= fightDuration)
+                battleState = BattleState.PlayerTurn;
         }
-        //after attack has ended got back to player's turn
-        SetBattleState(BattleState.PlayerTurn);
+        //Debug.Log(stateTimer);
+
     }
 
-    public float getEnemyTurnTimer()
+    protected IEnumerator BattleStartCutscene()
     {
-        if(battleState != BattleState.EnemyTurn)
-        {
-            Debug.LogWarning("Function was called when not enemy turn");
-            return 0;
-        } else
-            return elapsedTime;
+        //Create Dramatic black screen at the start that covers everything
+        DramaticScreen bg = Instantiate(GameManagment.Instance.dramaScreePF, new Vector2(3, -23), Quaternion.identity);
+        bg.onLoadCommand = DramaticScreen_OnLoadCommands.stayBlack;
+        bg.gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "UI";
+        bg.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 20;
+
+        yield return new WaitForSeconds(1.1f);
+        SoundManager.instance.PlaySound("cackle");
+
+        yield return new WaitForSeconds(1.6f);
+        SoundManager.instance.PlaySound("chaos");
+
+        yield return new WaitForSeconds(1.5f);
+        SoundManager.instance.PlayMusic("battleTheme");
+        Destroy(bg.gameObject);
+        battleState = BattleState.PlayerTurn;
+
     }
 
-    //Allows for the battle state to be manually changed
-    //while executing any cleanup code up before the transition
-    //TODO: maybe create/find "OnStateChange" event to handle this instead
-    private void SetBattleState(BattleState newBattleState)
+
+    //change this later; meant to be used with UI buttons
+    public void endPlayerTurn()
     {
-        //Don't execute anything else if we're out 
-        if (battleState == newBattleState)
-            return;
-
-        if (battleState == BattleState.EnemyTurn)
-        {
-            if (OnEnemyTurnExit != null)
-            {
-                Debug.Log("OnEnemyTurnExit event has fired");
-                OnEnemyTurnExit();
-            }
-        }
-
-        //Execute any special cleamup code before setting the new state 
-        switch (newBattleState)
-        {
-            case BattleState.Start: 
-                break;
-            case BattleState.PlayerTurn:
-                //Activate 
-                break;
-            case BattleState.EnemyTurn:
-                //Let everyone know that we're about to fight
-                if (OnEnemyTurnEnter != null)
-                {
-                   // Debug.Log("OnEnemyTurnEnter has fired");
-                    OnEnemyTurnEnter();
-                }
-                StartCoroutine(enemyTurnDuration());
-                break;
-            case BattleState.Banter:    
-                break;
-            case BattleState.End:   
-                break;
-        }
-
-        //Set battleState
-        battleState = newBattleState;
+        //this function should only happen on the enemy's turn
+        if (battleState != BattleState.PlayerTurn) return;
+        battleState = BattleState.FightPhase;
     }
 
-    //change this later
+    public void endBattle()
+    {
+        if (battleState != BattleState.FightPhase) return;
+
+        if (OnPlayerTurnEnter != null)
+        {
+            Debug.Log("player turn has begun");
+            OnPlayerTurnEnter();
+        }
+        //destroy battle arena
+        Destroy(arena);
+
+        battleState = BattleState.Banter;
+
+    }
+
     public void endTurn()
     {
-        if (battleState == BattleState.PlayerTurn)
+        //this function should only happen on the enemy's turn
+        if (battleState != BattleState.PlayerTurn) return;
+
+        battleState = BattleState.FightPhase;
+    }
+
+    /// <summary>
+    /// Event fires when teh banter step ends
+    /// </summary>
+    public Action OnBanterEnter;
+    protected void BanterEnter()
+    {
+        gameObject.GetComponent<DialougeManager>().enabled = true;
+        if(OnBanterEnter != null)
         {
-            SetBattleState(BattleState.EnemyTurn);
+            OnBanterEnter();
         }
     }
 
+    /// <summary>
+    /// Event that fires when the Enemy's turn begins
+    /// </summary>
     public event Action OnEnemyTurnEnter;
     private void EnemyTurnEnter()
     {
-        if (OnEnemyTurnEnter != null)
-        {
-            //Debug.Log(gameObject.name + " has dealt damage");
-            OnEnemyTurnEnter();
-        }
+        //Debug.Log("enemy turn has begun");
+        arena = Instantiate(arenaPF, ArenaSpawn, Quaternion.identity);
+
+        //disable menu
+        BattleMenu.Instance.gameObject.SetActive(false);
+
+        //fire off event
+        if (OnEnemyTurnEnter != null) { OnEnemyTurnEnter();}
+
     }
 
-    public event Action OnEnemyTurnExit;
-    private void EnemyTurnExit()
+    /// <summary>
+    /// This event that fires when the player's turn begins
+    /// </summary>
+    public event Action OnPlayerTurnEnter;
+    private void PlayerTurnEnter()
     {
-        if (OnEnemyTurnExit != null)
+        if (OnPlayerTurnEnter != null)
         {
-            //Debug.Log(gameObject.name + " has dealt damage");
-            OnEnemyTurnExit();
+            Debug.Log("player turn has begun");
+            OnPlayerTurnEnter();
         }
+
+        //destroy battle arena
+        Destroy(arena);
+        battleRound++;
+        //reset timer
+        fightDuration = defaultFightDuration;
+        //enable menu
+        BattleMenu.Instance.gameObject.SetActive(true);
+
     }
+
  
     private void OnDestroy()
     {
@@ -210,7 +277,7 @@ public class BattleManager : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         //Draw Player Battle Position
-        Gizmos.DrawCube(playerBattleStation, new Vector3 (.5f,.5f, .5f));
+        Gizmos.DrawCube(ArenaSpawn, new Vector3 (.5f,.5f, .5f));
 
         //Draw Battle Positions of enemies 
         foreach (Vector2 battlePos in enemyIdlePositions)
@@ -219,37 +286,5 @@ public class BattleManager : MonoBehaviour
             Gizmos.DrawSphere(battlePos, .35f);
     }
 
-    /// <summary>
-    /// Public version of state mutator that converts a string input before setting the state
-    /// </summary>
-    /// <param name="stateName"> string representing the new battle state</param>
-  public void SetBattleState(string stateName)
-  {
-        BattleState newBattleState;
-
-      switch (stateName.ToUpperInvariant())
-      {
-          case "START":
-                newBattleState = BattleState.Start;
-              break;
-          case "PLAYER_TURN":
-                newBattleState = BattleState.PlayerTurn;
-                break;
-          case "ENEMY_TURN":
-                newBattleState = BattleState.EnemyTurn;
-                break;
-          case "BANTER":
-                newBattleState = BattleState.Banter;
-                break;
-          case "END":
-                newBattleState = BattleState.End;
-                break;
-          default:
-              Debug.LogWarning(stateName + "is an invalid battleState");
-                return;
-      }
-        //set this to the new state
-        SetBattleState(newBattleState);
-  }
 
 }

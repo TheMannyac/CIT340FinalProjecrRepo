@@ -8,6 +8,7 @@ TagManager:
   - 'Enemy '
   - Projectile
   - Interactable
+  - Obstacle
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - Allies
   - Enemy Projectiles
   - Allied Projectiles
-  - 
+  - BattleBox
   - 
   - 
   - 
