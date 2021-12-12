@@ -535,7 +535,7 @@ GameObject:
   - component: {fileID: 1749033110}
   - component: {fileID: 1749033109}
   m_Layer: 0
-  m_Name: Text
+  m_Name: Tip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -557,8 +557,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.31, y: -184.5}
-  m_SizeDelta: {x: 705.25, y: 37.04}
+  m_AnchoredPosition: {x: 6.93, y: -181.12}
+  m_SizeDelta: {x: 690.77, y: 43.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1749033109
 MonoBehaviour:
@@ -955,6 +955,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 887284532}
+    - target: {fileID: 4868153360061244681, guid: aeaf8f062dccd704eab9f619d0273e7e, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.00000023842
+      objectReference: {fileID: 0}
+    - target: {fileID: 4868153360061244681, guid: aeaf8f062dccd704eab9f619d0273e7e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 134.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4868153360763203610, guid: aeaf8f062dccd704eab9f619d0273e7e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 

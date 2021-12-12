@@ -12,8 +12,6 @@ public class Starburst : Projectile
         transform.Rotate(Vector2.right * Time.deltaTime * rotSpeed);
     }
 
-    
-
     protected override void OnTriggerEnter2D(Collider2D collision)
     {
         switch (alignment)

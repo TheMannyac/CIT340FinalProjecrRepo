@@ -229,7 +229,7 @@ public class DaBozz : Enemy_BattleScene
             metorSpawnpoint.y = 13 + UnityEngine.Random.Range(0, meteor_yOffset);
 
             //Instansiate meteor
-            Instantiate(meteorPF, metorSpawnpoint,Quaternion.Euler(0,0,270));
+            Instantiate(meteorPF, metorSpawnpoint,Quaternion.identity);
             yield return new WaitForSeconds(interval);
         }
     }

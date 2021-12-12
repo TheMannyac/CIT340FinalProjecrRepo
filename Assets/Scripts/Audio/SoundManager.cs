@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
+    private static Sound[] allSounds;
     [SerializeField] private Sound[] sounds;
     [SerializeField] private Sound[] musicTracks;
 
@@ -17,11 +18,16 @@ public class SoundManager : MonoBehaviour
     public static SoundManager instance;
     private void Awake()
     {
+
         //Ensure that there is only one audio manager per scene
         if (instance == null)
             instance = this;
         else
         {
+            //swap audio sources 
+            //instance.sounds = this.sounds;
+            //instance.musicTracks = this.musicTracks;
+
             //Play this room's theme before destroying object
             if (this.StartMusicOnLOad)
             {
@@ -32,7 +38,7 @@ public class SoundManager : MonoBehaviour
                 instance.playOnLoad = this.playOnLoad;
             }
 
-            Destroy(this);
+            Destroy(gameObject);
             Debug.Log("SOUNDMANAGER DESTROYED");
             return;   
         }
@@ -75,7 +81,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySound(string name)
     {
-        Sound s = Array.Find(sounds, sound => sound.name == name);
+        Sound s = Array.Find(instance.sounds, sound => sound.name == name);
         if(s == null)
         {
             Debug.LogWarning("Sound " + name + " not found");
