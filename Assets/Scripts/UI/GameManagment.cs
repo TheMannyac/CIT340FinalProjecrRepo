@@ -44,11 +44,13 @@ public class GameManagment: MonoBehaviour
 
     public static void ExitGame()
     {
+        Application.Quit();
+    /*
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
     application.Quit();
-#endif
+#endif */
     }
 
 }
